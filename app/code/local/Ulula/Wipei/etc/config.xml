@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category    Ulula
+ * @package     Ulula_Wipei
+ * @copyright   Copyright (c) 2019 Ulula IT (http://ulula.net)
+ * @author    	Gaston De Marsico <gdemarsico@ulula.net>
+ */
+-->
+<config>
+    <modules>
+        <Ulula_Wipei>
+            <version>1.0.0</version>
+        </Ulula_Wipei>
+    </modules>
+    <global>
+    	<blocks>
+			<wipei>
+				<class>Ulula_Wipei_Block</class>
+			</wipei>
+		</blocks>
+		<helpers>
+			<wipei>
+				<class>Ulula_Wipei_Helper</class>
+			</wipei>
+		</helpers>
+		<models>
+			<wipei>
+				<class>Ulula_Wipei_Model</class>
+			</wipei>
+		</models>
+	</global>
+    <frontend>
+        <routers>
+            <wipei>
+                <use>standard</use>
+                <args>
+                    <module>Ulula_Wipei</module>
+                    <frontName>wipei</frontName>
+                </args>
+            </wipei>
+        </routers>
+    </frontend>
+    <default>
+    	<payment>
+    		<wipei_standard>
+    			<model>wipei/standard</model>
+    			<active>0</active>
+    			<title>Wipei</title>
+                <order_status>pending</order_status>
+                <allowspecific>0</allowspecific>
+                <debug>1</debug>
+    			<sort_order>1</sort_order>
+    		</wipei_standard>
+    	</payment>
+    </default>
+</config>

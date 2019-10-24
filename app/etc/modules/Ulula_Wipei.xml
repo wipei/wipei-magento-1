@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category    Ulula
+ * @package     Ulula_Wipei
+ * @copyright   Copyright (c) 2019 Ulula IT (http://ulula.net)
+ * @author    	Gaston De Marsico <gdemarsico@ulula.net>
+ */
+-->
+<config>
+    <modules>
+		<Ulula_Wipei>
+		    <active>true</active>
+		    <codePool>local</codePool>
+		    <depends>
+		        <Mage_Paygate/>
+		        <Mage_Checkout/>
+		        <Mage_Sales/>
+		    </depends>
+		</Ulula_Wipei>
+    </modules>
+</config>
