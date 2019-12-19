@@ -48,24 +48,6 @@ class Ulula_Wipei_Helper_Api extends Ulula_Wipei_Helper_Data
      */
     private $_type = null;
 
-    /**
-     * Ulula_Wipei_Helper_Api constructor.
-     * @throws
-     */
-    // public function __construct() {
-    //     $i = func_num_args();
-    //     if ($i > 2 || $i < 1) {
-    //         throw new \Exception('Invalid arguments. Use CLIENT_ID and CLIENT SECRET, or ACCESS_TOKEN');
-    //     }
-    //     if ($i == 1) {
-    //         $this->access_token = func_get_arg(0);
-    //     }
-    //     if ($i == 2) {
-    //         $this->client_id = func_get_arg(0);
-    //         $this->client_secret = func_get_arg(1);
-    //     }
-    // }
-
      /**
      * Get Access Token for API use
      * @throws
@@ -110,10 +92,63 @@ class Ulula_Wipei_Helper_Api extends Ulula_Wipei_Helper_Data
         return $preference_result;
     }
 
+    public function getPayment($payment_id)
+    {
+
+        $params = array ('order'=>$payment_id);
+        $headers = array('authorization: '.$this->get_access_token());
+        return $this->get('/order_store', $params, $headers);
+    }
+
+    private function build_query($params) 
+    {
+        if (function_exists("http_build_query")) {
+            return http_build_query($params, "", "&");
+        } else {
+            $elements = [];
+            foreach ($params as $name => $value) {
+                $elements[] = "{$name}=" . urlencode($value);
+            }
+            return implode("&", $elements);
+        }
+    }
+
+    public function get($uri, $params = null, $headers = array())
+    {
+        try{
+            $params = is_array ($params) ? $params : array();
+
+            if (count($params) > 0) {
+                $uri .= (strpos($uri, "?") === false) ? "?" : "&";
+                $uri .= $this->build_query($params);
+            }
+            $http = new Varien_Http_Adapter_Curl();
+            $config = array('timeout' => 10);
+            $headers = $this->getHeaders($headers);
+            $this->log('headers: '.json_encode($headers));
+            $this->log('params: '.json_encode($params));
+            $http->write(
+                    Zend_Http_Client::GET, 
+                    self::API_URL.$uri,
+                    '1.1',
+                    $headers,
+                    $params
+                );
+            $res = $http->read();
+            $cod = Zend_Http_Response::extractCode($res);
+            if ($cod == 200) {
+                $response = Zend_Http_Response::extractBody($res);
+            }
+            $this->log($cod);
+            $this->log($response);
+            $http->close();
+            return json_decode($response);
+        } catch(Exception $e) {
+            $this->log($e);
+        }
+    }
+
     public function post($uri, $params, $headers = array())
-    // {https://github.com/wipei/wipei-magento-php/blob/master/Lib/RestClient.php
-    // 	https://github.com/wipei/wipei-magento-php/blob/master/Lib/Api.php
-    // 	https://bitbucket.org/gdemarsico/dmg_recaptcha/src/master/src/app/code/local/Dmg/ReCaptcha/Helper/Data.php
     {
     	try{
 	    	$http = new Varien_Http_Adapter_Curl();

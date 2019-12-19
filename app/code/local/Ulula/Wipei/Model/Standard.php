@@ -3,13 +3,13 @@
  * @category    Ulula
  * @package     Ulula_Wipei
  * @copyright   Copyright (c) 2019 Ulula IT (http://ulula.net)
- * @author    	Gaston De Marsico <gdemarsico@ulula.net>
+ * @author        Gaston De Marsico <gdemarsico@ulula.net>
  */
 
 class Ulula_Wipei_Model_Standard extends Mage_Payment_Model_Method_Abstract
 {
 
-	/**
+    /**
      * Define payment method code
      */
     const CODE = 'wipei_standard';
@@ -19,7 +19,7 @@ class Ulula_Wipei_Model_Standard extends Mage_Payment_Model_Method_Abstract
      */
     const FAILURE_ACTION_URL = 'wipei/standard/failure';
 
-	/**
+    /**
      * define URL to go when an order is placed
      */
     const ACTION_URL = 'wipei/standard/redirect';
@@ -34,7 +34,7 @@ class Ulula_Wipei_Model_Standard extends Mage_Payment_Model_Method_Abstract
      */
     const SUCCESS_URL = 'checkout/onepage/success';
 
-	/**
+    /**
      * {@inheritdoc}
      */
     protected $_code = self::CODE;
@@ -48,7 +48,7 @@ class Ulula_Wipei_Model_Standard extends Mage_Payment_Model_Method_Abstract
      * {@inheritdoc}
      */
     protected $_infoBlockType = 'wipei/standard_info';
-	
+    
     /**
      * {@inheritdoc}
      */
@@ -107,16 +107,20 @@ class Ulula_Wipei_Model_Standard extends Mage_Payment_Model_Method_Abstract
     /**
      * {@inheritdoc}
      */
-	public function getOrderPlaceRedirectUrl()
-	{
-		return Mage::getUrl('wipei/standard/redirect', array('_secure' => true));
-	}
+    public function getOrderPlaceRedirectUrl()
+    {
+        return Mage::getUrl('wipei/standard/redirect', array('_secure' => true));
+    }
 
     public function submitPayment()
     {
         $apiHelper = Mage::helper('wipei/api');
         $preference = $this->makePreference();
         $apiPreference =  $apiHelper->createPreference($preference);
+        $order = Mage::getModel('sales/order')->loadByIncrementId($preference['external_reference']);
+        $initPonit = $apiPreference->init_point;
+        $order->addStatusToHistory($order->getStatus(), 'Init Ponit: '.$initPonit);
+        $order->save();
         return $apiPreference;
     }
 
@@ -136,19 +140,18 @@ class Ulula_Wipei_Model_Standard extends Mage_Payment_Model_Method_Abstract
         $this->_addDiscounts($preference['items'], $order);
         $this->_addTaxes($preference['items'], $order);
         $this->_addShipping($preference['items'], $order);
-        $order_amount = (float)$order->getBaseGrandTotal();
+        $orderAmount = (float)$order->getBaseGrandTotal();
+
+        $preference['total'] = $orderAmount;
         
-        if (!$order_amount) {
-            $order_amount = (float)$order->getBasePrice() + $shipment_cost;
-        }
-        $preference['total'] = $order_amount;
-        
-        if (isset($payment['additional_information']['doc_number']) && $payment['additional_information']['doc_number'] != "") {
-            $preference['payer']['identification'] = [
+        if (isset($payment['additional_information']['doc_number']) 
+            && $payment['additional_information']['doc_number'] != "") {
+            $preference['payer']['identification'] = array(
                 "type"   => "CPF",
                 "number" => $payment['additional_information']['doc_number']
-            ];
+            );
         }
+
         $preference['url_success'] = Mage::getUrl('checkout/onepage/success');
         $preference['url_notify'] = Mage::getUrl('wipei/standard/notify');
         $preference['url_failure'] = Mage::getUrl('checkout/onepage/failure');
@@ -173,6 +176,7 @@ class Ulula_Wipei_Model_Standard extends Mage_Payment_Model_Method_Abstract
                 'price'      => (float)number_format($item->getPrice(), 2, '.', '')
             );
         }
+
         return $items;
     }
 
