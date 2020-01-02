@@ -97,7 +97,7 @@ class Ulula_Wipei_Helper_Api extends Ulula_Wipei_Helper_Data
 
         $params = array ('order'=>$payment_id);
         $headers = array('authorization: '.$this->get_access_token());
-        return $this->get('/order_store', $params, $headers);
+        return $this->get('order_store', $params, $headers);
     }
 
     private function build_query($params) 
