@@ -11,6 +11,7 @@ class Ulula_Wipei_Helper_Data extends Mage_Core_Helper_Abstract
 
     const XML_PATH_CLIENT_ID = 'payment/wipei_standard/client_id';
     const XML_PATH_CLIENT_SECRET = 'payment/wipei_standard/client_secret';
+    const XML_PATH_DEBUG = 'payment/wipei_standard/debug';
 
     /**
      * Api log file
@@ -29,7 +30,7 @@ class Ulula_Wipei_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function debugMode()
     {
-        return true;
+        return (bool)Mage::getStoreConfig(self::XML_PATH_DEBUG);
     }
 
     public function log($message='')
