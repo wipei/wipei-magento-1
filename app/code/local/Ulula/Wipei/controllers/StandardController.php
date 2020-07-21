@@ -35,9 +35,17 @@ class Ulula_Wipei_StandardController extends Mage_Core_Controller_Front_Action
                         $this->createInvoice($order);
                         $status = 'processing';
                         break;
+                    case 'pending_approved':
+                        $this->createInvoice($order);
+                        $status = 'processing';
+                        break;
                     case 'cancelled':
                         $order->cancel();
-                        $status = 'cancelled';
+                        $status = 'canceled';
+                        break;
+                    case 'pending_cancelled:':
+                        $order->cancel();
+                        $status = 'canceled';
                         break;
                     default:
                         $status = $order->getStatus();
